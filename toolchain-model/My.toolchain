@@ -22,6 +22,11 @@
           <basicCapabilities resourceTypes="//@specification/@domainSpecifications.3/@resources.0"/>
         </services>
       </serviceProviders>
+      <serviceProviders title="Service Provider 2" description="Service Provider 2" instanceID="id1/{id1}/id2/{id2}">
+        <services domainSpecification="//@specification/@domainSpecifications.1">
+          <creationFactories title="CreationFactory1" label="CreationFactory1" creationURI="create" resourceTypes="//@specification/@domainSpecifications.3/@resources.0"/>
+        </services>
+      </serviceProviders>
     </serviceProviderCatalog>
     <specification/>
     <requiredAdaptors xsi:type="oslc4j_ai:GenericRequiredAdaptor" serviceProviderCatalogURI="http://your.host/adaptor/services/catalog/singleton" name="GenericRequiredAdaptor"/>
