@@ -100,7 +100,7 @@ public class ServiceProvider2sFactory
         URI serviceProviderURI = constructURI(serviceProviderInfo);
         String identifier = constructIdentifier(serviceProviderInfo);
         String basePath = OSLC4JUtils.getServletURI();
-        String title = String.format("Service Provider '%s'", serviceProviderInfo.name);
+        String title = serviceProviderInfo.name;
         String description = String.format("%s (id: %s; kind: %s)",
             "Service Provider 2",
             identifier,
