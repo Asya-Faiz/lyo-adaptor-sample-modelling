@@ -110,6 +110,11 @@
 					</webAppConfig>
 					<reload>automatic</reload>
 					<scanIntervalSeconds>5</scanIntervalSeconds>
+<!--
+					<env>
+						<LYO_BASE>http://127.0.0.1:8082</LYO_BASE>
+					</env>
+-->
 					<systemProperties>
 						<systemProperty>
 							<name>jetty.port</name>
