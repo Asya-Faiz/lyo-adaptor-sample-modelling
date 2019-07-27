@@ -52,12 +52,22 @@ To revert to the default generated content, delete all content in this file, and
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Query capability QueryCapability</title>
 
-  <link href="<c:url value="/static/css/bootstrap-4.0.0-beta.min.css"/>" rel="stylesheet">
-  <link href="<c:url value="/static/css/adaptor.css"/>" rel="stylesheet">
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.0/css/bootstrap.min.css"
+        rel="stylesheet"
+        integrity="sha384-PDle/QlgIONtM1aqA2Qemk5gPOE7wFq8+Em+G/hmo5Iq0CCmYZLv3fVRDJ4MMwEA"
+        crossorigin="anonymous">
+  <script
+    src="https://code.jquery.com/jquery-3.4.1.min.js"
+    integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+    crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.15.0/umd/popper.min.js"
+          integrity="sha256-fTuUgtT7O2rqoImwjrhDgbXTKUwyxxujIMRIK7TbuNU="
+          crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.0/js/bootstrap.min.js"
+          integrity="sha384-7aThvCh9TypR7fIc2HV4O/nFMVCBwyIUKL8XCtKE+8xgCgl/PQGuFsvShjr74PBp"
+          crossorigin="anonymous"></script>
 
-  <script src="<c:url value="/static/js/jquery-3.2.1.min.js"/>"></script>
-  <script src="<c:url value="/static/js/popper-1.11.0.min.js"/>"></script>
-  <script src="<c:url value="/static/js/bootstrap-4.0.0-beta.min.js"/>"></script>
+  <link href="<c:url value="/static/css/adaptor.css"/>" rel="stylesheet">
   <script src="<c:url value="/static/js/preview.js"/>"></script>
 
 </head>
