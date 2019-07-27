@@ -5,13 +5,13 @@
  *  All rights reserved. This program and the accompanying materials
  *  are made available under the terms of the Eclipse Public License v1.0
  *  and Eclipse Distribution License v. 1.0 which accompanies this distribution.
- *  
+ *
  *  The Eclipse Public License is available at http://www.eclipse.org/legal/epl-v10.html
  *  and the Eclipse Distribution License is available at
  *  http://www.eclipse.org/org/documents/edl-v10.php.
- *  
+ *
  *  Contributors:
- *  
+ *
  *	   Sam Padgett	       - initial API and implementation
  *     Michael Fiedler     - adapted for OSLC4J
  *     Jad El-khoury        - initial implementation of code generator (https://bugs.eclipse.org/bugs/show_bug.cgi?id=422448)
@@ -41,6 +41,7 @@ import java.net.URISyntaxException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
+import com.google.common.collect.ImmutableList;
 // End of user code
 
 // Start of user code pre_class_code
@@ -51,8 +52,8 @@ public class RMToolManager {
     // Start of user code class_attributes
 	private static final Logger log = LoggerFactory.getLogger(RMToolManager.class);
     // End of user code
-    
-    
+
+
     // Start of user code class_methods
 	private static int randomNumber(int origin, int bound) {
 		return ThreadLocalRandom.current().nextInt(origin, bound);
@@ -83,15 +84,15 @@ public class RMToolManager {
 
     public static void contextInitializeServletListener(final ServletContextEvent servletContextEvent)
     {
-        
+
         // Start of user code contextInitializeServletListener
         // TODO Implement code to establish connection to data backbone etc ...
         // End of user code
     }
 
-    public static void contextDestroyServletListener(ServletContextEvent servletContextEvent) 
+    public static void contextDestroyServletListener(ServletContextEvent servletContextEvent)
     {
-        
+
         // Start of user code contextDestroyed
         // TODO Implement code to shutdown connections to data backbone etc...
         // End of user code
@@ -100,7 +101,7 @@ public class RMToolManager {
     public static ServiceProviderInfo[] getServiceProviderInfos(HttpServletRequest httpServletRequest)
     {
         ServiceProviderInfo[] serviceProviderInfos = {};
-        
+
         // Start of user code "ServiceProviderInfo[] getServiceProviderInfos(...)"
         ServiceProviderInfo r1 = new ServiceProviderInfo();
         r1.name = "A sample RM Service Provider 1";
@@ -120,16 +121,16 @@ public class RMToolManager {
     public static List<Requirement> queryRequirements(HttpServletRequest httpServletRequest, String where, int page, int limit)
     {
         List<Requirement> resources = null;
-        
+
         // Start of user code queryRequirements
     	resources = createRandomRequirements(1,  30, 1,  10000);
         // End of user code
-        return resources;
+        return ImmutableList.copyOf(resources);
     }
-    public static List<Requirement> RequirementSelector(HttpServletRequest httpServletRequest, String terms)   
+    public static List<Requirement> RequirementSelector(HttpServletRequest httpServletRequest, String terms)
     {
         List<Requirement> resources = null;
-        
+
         // Start of user code RequirementSelector
     	resources = createRandomRequirements(1,  30, 1,  10000);
         // End of user code
@@ -140,7 +141,7 @@ public class RMToolManager {
     public static Requirement getRequirement(HttpServletRequest httpServletRequest, final String requirementId)
     {
         Requirement aResource = null;
-        
+
         // Start of user code getRequirement
     	aResource = createRandomRequirement(requirementId);
         // End of user code

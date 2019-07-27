@@ -126,7 +126,7 @@ public class ServiceProviderService1
         produces = OslcMediaType.APPLICATION_RDF_XML + ", " + OslcMediaType.APPLICATION_XML + ", " + OslcMediaType.APPLICATION_JSON + ", " + OslcMediaType.TEXT_TURTLE + ", " + MediaType.TEXT_HTML
     )
     public Requirement[] queryRequirements(
-                                                    
+
                                                      @QueryParam("oslc.where") final String where,
                                                      @QueryParam("page") final String pageString,
                                                     @QueryParam("limit") final String limitString) throws IOException, ServletException
@@ -158,7 +158,7 @@ public class ServiceProviderService1
         produces = OslcMediaType.APPLICATION_RDF_XML + ", " + OslcMediaType.APPLICATION_XML + ", " + OslcMediaType.APPLICATION_JSON + ", " + OslcMediaType.TEXT_TURTLE + ", " + MediaType.TEXT_HTML
     )
     public Response queryRequirementsAsHtml(
-                                    
+
                                        @QueryParam("oslc.where") final String where,
                                        @QueryParam("page") final String pageString,
                                     @QueryParam("limit") final String limitString) throws ServletException, IOException
@@ -175,20 +175,20 @@ public class ServiceProviderService1
         // Start of user code queryRequirementsAsHtml
         // End of user code
 
-        final List<Requirement> resources = RMToolManager.queryRequirements(httpServletRequest, where, page, limit);
+        List<Requirement> resources = RMToolManager.queryRequirements(httpServletRequest, where, page, limit + 1);
 
         if (resources!= null) {
-            httpServletRequest.setAttribute("resources", resources);
             // Start of user code queryRequirementsAsHtml_setAttributes
             // End of user code
 
             httpServletRequest.setAttribute("queryUri",
                     uriInfo.getAbsolutePath().toString() + "?oslc.paging=true");
             if (resources.size() > limit) {
-                resources.remove(resources.size() - 1);
+                resources = resources.subList(0, limit);
                 httpServletRequest.setAttribute("nextPageUri",
                         uriInfo.getAbsolutePath().toString() + "?oslc.paging=true&amp;page=" + (page + 1));
             }
+            httpServletRequest.setAttribute("resources", resources);
             RequestDispatcher rd = httpServletRequest.getRequestDispatcher("/com/sample/rm/requirementscollection.jsp");
             rd.forward(httpServletRequest,httpServletResponse);
         }
@@ -211,7 +211,7 @@ public class ServiceProviderService1
     @Consumes({ MediaType.TEXT_HTML, MediaType.WILDCARD })
     public void RequirementSelector(
         @QueryParam("terms") final String terms
-        
+
         ) throws ServletException, IOException
     {
         try {
