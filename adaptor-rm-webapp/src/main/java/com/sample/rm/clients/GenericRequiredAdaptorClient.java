@@ -13,7 +13,7 @@
  * Contributors:
  *
  *     Jad El-khoury        - initial implementation of client code
- *     
+ *
  *******************************************************************************/
 // End of user code
 
@@ -36,13 +36,21 @@ public class GenericRequiredAdaptorClient
 
     // Start of user code class_attributes
     // End of user code
-    
+
     // Start of user code class_methods
     // End of user code
 
-    static String serviceProviderCatalogURI = "http://your.host/adaptor/services/catalog/singleton";
+    private String serviceProviderCatalogURI = "http://your.host/adaptor/services/catalog/singleton";
 
-    public static ServiceProviderCatalog getServiceProviderCatalog() throws Exception {
+    public GenericRequiredAdaptorClient() {
+    }
+
+    public GenericRequiredAdaptorClient(String serviceProviderCatalogURI) {
+        this.serviceProviderCatalogURI = serviceProviderCatalogURI;
+    }
+
+
+    public ServiceProviderCatalog getServiceProviderCatalog() throws Exception {
         OslcClient client = new OslcClient();
         ClientResponse response = null;
         ServiceProviderCatalog catalog = null;
