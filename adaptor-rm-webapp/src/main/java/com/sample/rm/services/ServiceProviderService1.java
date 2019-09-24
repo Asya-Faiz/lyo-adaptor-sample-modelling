@@ -58,6 +58,7 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.UriBuilder;
 
+import org.apache.wink.json4j.JSONException;
 import org.apache.wink.json4j.JSONObject;
 import org.eclipse.lyo.oslc4j.provider.json4j.JsonHelper;
 import org.eclipse.lyo.oslc4j.core.OSLC4JUtils;
@@ -173,7 +174,7 @@ public class ServiceProviderService1
         produces = OslcMediaType.APPLICATION_RDF_XML + ", " + OslcMediaType.APPLICATION_XML + ", " + OslcMediaType.APPLICATION_JSON + ", " + OslcMediaType.TEXT_TURTLE + ", " + MediaType.TEXT_HTML
     )
     public Requirement[] queryRequirements(
-
+                                                    
                                                      @QueryParam("oslc.where") final String where,
                                                      @QueryParam("page") final String pageString,
                                                     @QueryParam("limit") final String limitString) throws IOException, ServletException
@@ -205,7 +206,7 @@ public class ServiceProviderService1
         produces = OslcMediaType.APPLICATION_RDF_XML + ", " + OslcMediaType.APPLICATION_XML + ", " + OslcMediaType.APPLICATION_JSON + ", " + OslcMediaType.TEXT_TURTLE + ", " + MediaType.TEXT_HTML
     )
     public Response queryRequirementsAsHtml(
-
+                                    
                                        @QueryParam("oslc.where") final String where,
                                        @QueryParam("page") final String pageString,
                                     @QueryParam("limit") final String limitString) throws ServletException, IOException
@@ -258,41 +259,163 @@ public class ServiceProviderService1
     @Consumes({ MediaType.TEXT_HTML, MediaType.WILDCARD })
     public void RequirementSelector(
         @QueryParam("terms") final String terms
-
+        
         ) throws ServletException, IOException
     {
-        try {
-            // Start of user code RequirementSelector_init
+        // Start of user code RequirementSelector_init
             // End of user code
 
-            httpServletRequest.setAttribute("selectionUri",UriBuilder.fromUri(OSLC4JUtils.getServletURI()).path(uriInfo.getPath()).build().toString());
-            // Start of user code RequirementSelector_setAttributes
+        httpServletRequest.setAttribute("selectionUri",UriBuilder.fromUri(OSLC4JUtils.getServletURI()).path(uriInfo.getPath()).build().toString());
+        // Start of user code RequirementSelector_setAttributes
             // End of user code
 
-            if (terms != null ) {
-                httpServletRequest.setAttribute("terms", terms);
-                final List<Requirement> resources = RMToolManager.RequirementSelector(httpServletRequest, terms);
-                if (resources!= null) {
-                            httpServletRequest.setAttribute("resources", resources);
-                            RequestDispatcher rd = httpServletRequest.getRequestDispatcher("/com/sample/rm/requirementselectorresults.jsp");
-                            rd.forward(httpServletRequest, httpServletResponse);
-                }
-                //a empty search should return an empty list and not NULL!
-                throw new WebApplicationException(Status.NOT_FOUND);
-
-            } else {
-                try {
-                    RequestDispatcher rd = httpServletRequest.getRequestDispatcher("/com/sample/rm/requirementselector.jsp");
-                    rd.forward(httpServletRequest, httpServletResponse);
-                } catch (Exception e) {
-                    throw new ServletException(e);
-                }
+        if (terms != null ) {
+            httpServletRequest.setAttribute("terms", terms);
+            final List<Requirement> resources = RMToolManager.RequirementSelector(httpServletRequest, terms);
+            if (resources!= null) {
+                        httpServletRequest.setAttribute("resources", resources);
+                        RequestDispatcher rd = httpServletRequest.getRequestDispatcher("/com/sample/rm/requirementselectorresults.jsp");
+                        rd.forward(httpServletRequest, httpServletResponse);
             }
-        } catch (Exception e) {
-            throw new WebApplicationException(e);
+            //a empty search should return an empty list and not NULL!
+            throw new WebApplicationException(Status.NOT_FOUND);
+
+        } else {
+            RequestDispatcher rd = httpServletRequest.getRequestDispatcher("/com/sample/rm/requirementselector.jsp");
+            rd.forward(httpServletRequest, httpServletResponse);
         }
     }
 
+    /**
+     * Create a single Requirement via RDF/XML, XML or JSON POST
+     *
+     * @throws IOException
+     * @throws ServletException
+     */
+    @OslcCreationFactory
+    (
+         title = "CreationFactory1",
+         label = "CreationFactory1",
+         resourceShapes = {OslcConstants.PATH_RESOURCE_SHAPES + "/" + Oslc_rmDomainConstants.REQUIREMENT_PATH},
+         resourceTypes = {Oslc_rmDomainConstants.REQUIREMENT_TYPE},
+         usages = {}
+    )
+    @POST
+    @Path("create")
+    @Consumes({OslcMediaType.APPLICATION_RDF_XML, OslcMediaType.APPLICATION_JSON_LD, OslcMediaType.TEXT_TURTLE, OslcMediaType.APPLICATION_XML, OslcMediaType.APPLICATION_JSON })
+    @Produces({OslcMediaType.APPLICATION_RDF_XML, OslcMediaType.APPLICATION_JSON_LD, OslcMediaType.TEXT_TURTLE, OslcMediaType.APPLICATION_XML, OslcMediaType.APPLICATION_JSON})
+    @ApiOperation(
+        value = "Creation factory for resources of type {" + Oslc_rmDomainConstants.REQUIREMENT_LOCALNAME + "}",
+        notes = "Creation factory for resources of type {" + "<a href=\"" + Oslc_rmDomainConstants.REQUIREMENT_TYPE + "\">" + Oslc_rmDomainConstants.REQUIREMENT_LOCALNAME + "</a>" + "}" +
+            ", with respective resource shapes {" + "<a href=\"" + "../services/" + OslcConstants.PATH_RESOURCE_SHAPES + "/" + Oslc_rmDomainConstants.REQUIREMENT_PATH + "\">" + Oslc_rmDomainConstants.REQUIREMENT_LOCALNAME + "</a>" + "}",
+        produces = OslcMediaType.APPLICATION_RDF_XML + ", " + OslcMediaType.APPLICATION_XML + ", " + OslcMediaType.APPLICATION_JSON + ", " + OslcMediaType.TEXT_TURTLE
+    )
+    public Response createRequirement(
+            
+            final Requirement aResource
+        ) throws IOException, ServletException
+    {
+        Requirement newResource = RMToolManager.createRequirement(httpServletRequest, aResource);
+        httpServletResponse.setHeader("ETag", RMToolManager.getETagFromRequirement(newResource));
+        return Response.created(newResource.getAbout()).entity(newResource).header(RMToolConstants.HDR_OSLC_VERSION, RMToolConstants.OSLC_VERSION_V2).build();
+    }
+
+    /**
+     * OSLC delegated creation dialog for a single resource
+     *
+     * @throws IOException
+     * @throws ServletException
+     */
+    @GET
+    @Path("creator")
+    @Consumes({MediaType.WILDCARD})
+    public void RequirementCreator(
+                
+        ) throws IOException, ServletException
+    {
+        // Start of user code RequirementCreator
+        // End of user code
+
+        httpServletRequest.setAttribute("creatorUri", UriBuilder.fromUri(OSLC4JUtils.getServletURI()).path(uriInfo.getPath()).build().toString());
+
+        RequestDispatcher rd = httpServletRequest.getRequestDispatcher("/com/sample/rm/requirementcreator.jsp");
+        rd.forward(httpServletRequest, httpServletResponse);
+    }
+
+    /**
+     * Backend creator for the OSLC delegated creation dialog.
+     *
+     * Accepts the input in FormParams and returns a small JSON response
+     */
+    @OslcDialog
+    (
+         title = "CreationDialog1",
+         label = "CreationDialog1",
+         uri = "requirements/creator",
+         hintWidth = "0px",
+         hintHeight = "0px",
+         resourceTypes = {Oslc_rmDomainConstants.REQUIREMENT_TYPE},
+         usages = {}
+    )
+    @POST
+    @Path("creator")
+    @Consumes({ MediaType.APPLICATION_FORM_URLENCODED})
+    public void createRequirementFromDialog(
+            
+        ) {
+        Requirement newResource = null;
+
+        Requirement aResource = new Requirement();
+
+        String[] paramValues;
+
+        paramValues = httpServletRequest.getParameterValues("title");
+        if (paramValues != null) {
+                if (paramValues.length == 1) {
+                    if (paramValues[0].length() != 0)
+                        aResource.setTitle(paramValues[0]);
+                    // else, there is an empty value for that parameter, and hence ignore since the parameter is not actually set.
+                }
+
+        }
+        paramValues = httpServletRequest.getParameterValues("description");
+        if (paramValues != null) {
+                if (paramValues.length == 1) {
+                    if (paramValues[0].length() != 0)
+                        aResource.setDescription(paramValues[0]);
+                    // else, there is an empty value for that parameter, and hence ignore since the parameter is not actually set.
+                }
+
+        }
+
+        newResource = RMToolManager.createRequirementFromDialog(httpServletRequest, aResource);
+
+        if (newResource != null) {
+            httpServletRequest.setAttribute("newResource", newResource);
+            httpServletRequest.setAttribute("newResourceUri", newResource.getAbout().toString());
+
+            // Send back to the form a small JSON response
+            httpServletResponse.setContentType("application/json");
+            httpServletResponse.setStatus(Status.CREATED.getStatusCode());
+            httpServletResponse.addHeader("Location", newResource.getAbout().toString());
+            try {
+                PrintWriter out = httpServletResponse.getWriter();
+    
+                JSONObject oslcResponse = new JSONObject();
+                JSONObject newResourceJson = new JSONObject();
+                newResourceJson.put("rdf:resource", newResource.getAbout().toString());
+                // Start of user code OSLC Resource Label
+                newResourceJson.put("oslc:label", newResource.toString());
+                // End of user code
+                oslcResponse.put("oslc:results", new Object[]{newResourceJson});
+    
+                out.print(oslcResponse.toString());
+                out.close();
+            } catch (IOException | JSONException e) {
+                throw new WebApplicationException(e);
+            }
+        }
+    }
     @GET
     @Path("{requirementId}")
     @Produces({OslcMediaType.APPLICATION_RDF_XML, OslcMediaType.APPLICATION_JSON_LD, OslcMediaType.TEXT_TURTLE, OslcMediaType.APPLICATION_XML, OslcMediaType.APPLICATION_JSON})
@@ -455,4 +578,70 @@ public class ServiceProviderService1
 
         throw new WebApplicationException(Status.NOT_FOUND);
     }
+    @DELETE
+    @Path("{requirementId}")
+    @ApiOperation(
+        value = "DELETE for resources of type {" + Oslc_rmDomainConstants.REQUIREMENT_LOCALNAME + "}",
+        notes = "DELETE for resources of type {" + "<a href=\"" + Oslc_rmDomainConstants.REQUIREMENT_TYPE + "\">" + Oslc_rmDomainConstants.REQUIREMENT_LOCALNAME + "</a>" + "}" +
+            ", with respective resource shapes {" + "<a href=\"" + "../services/" + OslcConstants.PATH_RESOURCE_SHAPES + "/" + Oslc_rmDomainConstants.REQUIREMENT_PATH + "\">" + Oslc_rmDomainConstants.REQUIREMENT_LOCALNAME + "</a>" + "}",
+        produces = OslcMediaType.APPLICATION_RDF_XML + ", " + OslcMediaType.APPLICATION_XML + ", " + OslcMediaType.APPLICATION_JSON + ", " + OslcMediaType.TEXT_TURTLE + ", " + MediaType.TEXT_HTML + ", " + OslcMediaType.APPLICATION_X_OSLC_COMPACT_XML
+    )
+    public Response deleteRequirement(
+                @PathParam("requirementId") final String requirementId
+        ) throws IOException, ServletException, URISyntaxException
+    {
+        // Start of user code deleteRequirement_init
+        // End of user code
+        final Requirement aResource = RMToolManager.getRequirement(httpServletRequest, requirementId);
+
+        if (aResource != null) {
+            // Start of user code deleteRequirement
+            // End of user code
+            boolean deleted = RMToolManager.deleteRequirement(httpServletRequest, requirementId);
+            if (deleted)
+                return Response.ok().header(RMToolConstants.HDR_OSLC_VERSION, RMToolConstants.OSLC_VERSION_V2).build();
+            else
+                throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+        }
+        throw new WebApplicationException(Status.NOT_FOUND);
+    }
+
+    @PUT
+    @Path("{requirementId}")
+    @Consumes({OslcMediaType.APPLICATION_RDF_XML, OslcMediaType.APPLICATION_JSON_LD, OslcMediaType.TEXT_TURTLE, OslcMediaType.APPLICATION_XML, OslcMediaType.APPLICATION_JSON })
+    @ApiOperation(
+        value = "PUT for resources of type {" + Oslc_rmDomainConstants.REQUIREMENT_LOCALNAME + "}",
+        notes = "PUT for resources of type {" + "<a href=\"" + Oslc_rmDomainConstants.REQUIREMENT_TYPE + "\">" + Oslc_rmDomainConstants.REQUIREMENT_LOCALNAME + "</a>" + "}" +
+            ", with respective resource shapes {" + "<a href=\"" + "../services/" + OslcConstants.PATH_RESOURCE_SHAPES + "/" + Oslc_rmDomainConstants.REQUIREMENT_PATH + "\">" + Oslc_rmDomainConstants.REQUIREMENT_LOCALNAME + "</a>" + "}",
+        produces = OslcMediaType.APPLICATION_RDF_XML + ", " + OslcMediaType.APPLICATION_XML + ", " + OslcMediaType.APPLICATION_JSON + ", " + OslcMediaType.TEXT_TURTLE + ", " + MediaType.TEXT_HTML + ", " + OslcMediaType.APPLICATION_X_OSLC_COMPACT_XML
+    )
+    public Response updateRequirement(
+            @HeaderParam("If-Match") final String eTagHeader,
+            @PathParam("requirementId") final String requirementId ,
+            final Requirement aResource
+        ) throws IOException, ServletException
+    {
+        // Start of user code updateRequirement_init
+        // End of user code
+        final Requirement originalResource = RMToolManager.getRequirement(httpServletRequest, requirementId);
+
+        if (originalResource != null) {
+            final String originalETag = RMToolManager.getETagFromRequirement(originalResource);
+
+            if ((eTagHeader == null) || (originalETag.equals(eTagHeader))) {
+                // Start of user code updateRequirement
+                // End of user code
+                final Requirement updatedResource = RMToolManager.updateRequirement(httpServletRequest, aResource, requirementId);
+                httpServletResponse.setHeader("ETag", RMToolManager.getETagFromRequirement(updatedResource));
+                return Response.ok().header(RMToolConstants.HDR_OSLC_VERSION, RMToolConstants.OSLC_VERSION_V2).build();
+            }
+            else {
+                throw new WebApplicationException(Status.PRECONDITION_FAILED);
+            }
+        }
+        else {
+            throw new WebApplicationException(Status.NOT_FOUND);
+        }
+    }
+
 }
